@@ -6,6 +6,6 @@
 + Lasso L1
 + ElasticNet
 
-`raport.pdf` zawiera omówienie `main.pdf`
+`raport.pdf` zawiera omówienie `main.ipynb`
 
 Projekt został wykonany w ramach kursu Metody Probabilistyczne w Uczeniu Maszynowym na Uniwersytecie Jagiellońskim.
