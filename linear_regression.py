@@ -26,7 +26,6 @@ def GD_OLS_finite_difference_linear_regression(X, y, X_val, y_val, alpha, epochs
         theta -= alpha * grad
     return theta, [], []
 
-#
 def GD_linear_regression(X, y, X_val, y_val, grad, alpha, epochs, steps, loss=ols):
     X = np.c_[np.ones(X.shape[0]), X]
     theta = np.zeros((X.shape[1], 1))
@@ -83,14 +82,14 @@ def L2_analytic_linear_regression(X, y, X_val, y_val, intercept, lambdaa, loss):
     train_loss = loss(X, theta, y)
     return theta, [val_loss], [train_loss]
 
-def L1_linear_regression(X, y, X_val, y_val, intercept, lambdaa, epochs, loss, steps):
-    if intercept:
+def L1_linear_regression(X, y, X_val, y_val, intercept, lambdaa, epochs, loss, steps, elastic_net=False):
+    if intercept and not elastic_net:
         X = np.c_[np.ones(X.shape[0]), X]
     theta = np.zeros((X.shape[1], 1))
     val_loss = np.zeros(steps)
     train_loss = np.zeros(steps)
 
-    if intercept:
+    if intercept and not elastic_net:
         X_val = np.c_[np.ones(X_val.shape[0]), X_val]
 
     for i in range(1, epochs + 1):
@@ -117,3 +116,19 @@ def L1_linear_regression(X, y, X_val, y_val, intercept, lambdaa, epochs, loss, s
             train_loss[i // (epochs // steps) - 1] = loss(X, theta, y)
 
     return theta, val_loss, train_loss
+
+def ElasticNet_linear_regression(X, y, X_val, y_val, intercept, lambdaa, alpha, epochs, loss, steps):
+    if intercept:
+        X = np.c_[np.ones(X.shape[0]), X]
+
+    if intercept:
+        X_val = np.c_[np.ones(X_val.shape[0]), X_val]
+
+    # now we need to augment our planning matrix
+    I = np.eye(X.shape[1]) * np.sqrt(alpha * lambdaa)
+    if intercept:
+        I[0, 0] = 0
+    X = np.r_[X, I]
+    y = np.r_[y, np.zeros((X.shape[1], 1))]
+
+    return L1_linear_regression(X, y, X_val, y_val, intercept, (1 - alpha) * lambdaa, epochs, loss, steps, elastic_net=True)

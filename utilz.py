@@ -97,3 +97,19 @@ def search_batch_size(model, loss, datasets, batch_sizes, standardize):
                 standardize=standardize,
                 use_test=False)
             print(f"Batch size: {batch_size}, validation loss {loss_history[-1]}")
+
+def learning_curve(model, loss, datasets, training_set_fractions):
+    training_losses = []
+    test_losses = []
+    for fraction in training_set_fractions:
+        cut_datasets = []
+        for dataset in datasets:
+            train_set, val_set, test_set = dataset
+            train_set = train_set[:int(len(train_set) * fraction)]
+            cut_datasets.append((train_set, val_set, test_set))
+        _, test_loss, _, train_loss = (
+            run_linear_regression_model(model=model, loss=loss, datasets=cut_datasets, standardize=True, use_test=False))
+
+        training_losses.append(train_loss[-1])
+        test_losses.append(test_loss)
+    return training_losses, test_losses
